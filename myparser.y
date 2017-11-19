@@ -8,25 +8,27 @@ void yyerror(const char *);
 
 %}
 
-%token IF_TOK ~
-%token ELSE_TOK ~
-%token WHILE_TOK ~
-%token RETURN_TOK ~
-%token VOID_TOK ~
-%token BREAK_TOK ~
-%token PUTS_TOK ~
-
-%token INT_TOK ~
-%token CHAR_TOK ~
 
 
-%token CONTINUE_TOK ~
-%token WRITEINT_TOK ~
-%token READINT_TOK ~
-%token CHAR_CONST_TOK ~
-%token STR_CONST_TOK ~
+%token IF_TOK 
+%token ELSE_TOK 
+%token WHILE_TOK 
+%token RETURN_TOK 
+%token VOID_TOK 
+%token BREAK_TOK 
+%token PUTS_TOK 
+
+%token INT_TOK 
+%token CHAR_TOK 
+
+
+%token CONTINUE_TOK 
+%token WRITEINT_TOK 
+%token READINT_TOK 
+%token CHAR_CONST_TOK 
+%token STR_CONST_TOK 
 %token NUMBER_TOK
-%token ID_TOK ~
+%token ID_TOK 
 
 %token SAME
 %token DIFFERENT
@@ -36,7 +38,7 @@ void yyerror(const char *);
 
 %token ASIGN
 %token MODULO
-%token SUM
+%token PLUS
 %token MINUS
 %token STAR
 %token DIVIDE
@@ -48,12 +50,18 @@ void yyerror(const char *);
 %token GREATER_THAN_EQUAL
 %token GREATER_THAN
 
-%nonassoc ASIGN
-%left STAR DIVIDE
-%left SUM MINUS 
-%left NOT LESS_THAN LESS_THAN_EQUAL GREATER_THAN GREATER_THAN_EQUAL  
+
+%nonassoc NOT LESS_THAN LESS_THAN_EQUAL GREATER_THAN GREATER_THAN_EQUAL  
+
+%left ASIGN
+%left STAR DIVIDE	OR
+%left PLUS MINUS 	AND
 %left UNARY_MINUS_TOK 
 
+
+%expect 1
+
+%start micro_c_program	
 
 %%
 
@@ -71,17 +79,13 @@ type_specifier :
 					|CHAR_TOK
 					;
 
-param_decl_list :
-					parameter_decl	
-					parameter_decl_rep		
-					;
+param_decl_list : parameter_decl parameter_decl_rep |;
 
 parameter_decl_rep :
-			parameter_decl_rep
 			','
+			parameter_decl_rep
 			parameter_decl
 			| 
-
 		;
 
 parameter_decl :
@@ -193,12 +197,19 @@ condition:
 disjunction: 
 
 	conjunction
-	| disjunction '||' conjunction
+	| disjunction OR conjunction
 
 ;
 
+
 conjunction: 
 
+	comparison
+	|conjunction AND comparison
+	
+;
+
+comparison:
 	relation
 	| relation SAME relation
 	| relation DIFFERENT relation
@@ -231,7 +242,7 @@ term:
 
 	term '*' factor
 	| term '/' factor
-	| term '%' factor
+	| term MODULO factor
 	| factor
 
 ;
@@ -293,7 +304,7 @@ int main(int argc, char **argv)
 
 void yyerror(char const *s)
 {
-	fprintf(stderr, "Error: %s in lin %d, column %d\n",s,line,column);
+	fprintf(stderr, "Error: %s in line %d, column %d\n", s, line,column);
 	exit(1);
 }
 

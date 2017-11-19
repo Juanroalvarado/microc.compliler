@@ -11,22 +11,20 @@ int intval;
 LETTER 	[a-zA-Z_]
 DIGIT	[0-9]
 CHAR_CONST	'[\x20-\xFF]'
-STR_CONST	\"([ -[]*[\]-~]*(\\[\\\"n])*)*\"
+STR_CONST	\"([ -[][\]-~](\\[\\\"n]))\"
 
 ID		{LETTER}({LETTER}|{DIGIT})*
 HEXA	0[xX][0-9a-fA-F]{1,4}
 NUMBER	{DIGIT}{DIGIT}*
 
-NEWLINE		[\n]
+NEWLINE		[\n|\r]
 SPACE		[ ]
 TAB			[\t]
-CR			[\r]
 
 %%
 {TAB}		{ column += 4; printf("\t");}
-{SPACE}		{ ++column; printf(" ");}
-{NEWLINE}	|
-{CR}		{ column = 1; ++line; printf("\n");}
+{SPACE}		{ ++column;}
+{NEWLINE}	{ column = 1; ++line; printf("\n");}
 
 "/*"	{ column = yyleng; BEGIN(comment);}
 
@@ -40,23 +38,23 @@ CR			[\r]
 <comment>"*/"	{BEGIN(INITIAL);}
 <comment>.		{ ++column; }
 
-if		{ column += 2; return(IF_TOK);}
-else	{ column += 4; return(ELSE_TOK);}
-while	{ column += 5; return(WHILE_TOK);}
-return	{ column += 6; return(RETURN_TOK);}
-void	{ column += 4; return(VOID_TOK);}
-break	{ column += 5; return(BREAK_TOK);}
-puts	{ column += 4; return(PUTS_TOK);}
-int		{ column += 3; return(INT_TOK);}
-char	{ column += 4; return(CHAR_TOK);}
+if		{ column += 2; printf("IF_TOK "); return(IF_TOK);}
+else	{ column += 4; printf("ELSE_TOK "); return(ELSE_TOK);}
+while	{ column += 5; printf("WHILE_TOK "); return(WHILE_TOK);}
+return	{ column += 6; printf("RETURN_TOK "); return(RETURN_TOK);}
+void	{ column += 4; printf("VOID_TOK "); return(VOID_TOK);}
+break	{ column += 5; printf("BREAK_TOK "); return(BREAK_TOK);}
+puts	{ column += 4; printf("PUTS_TOK "); return(PUTS_TOK);}
+int		{ column += 3; printf("INT_TOK "); return(INT_TOK);}
+char	{ column += 4; printf("CHAR_TOK "); return(CHAR_TOK);}
 
-continue	{ column += 8; return(CONTINUE_TOK);}
+continue	{ column += 8; printf("CONTINUE_TOK "); return(CONTINUE_TOK);}
 
-writeint	{ column += 8; return(WRITEINT_TOK);}
-readint		{ column += 7; return(READINT_TOK);}
+writeint	{ column += 8; printf("WRITEINT_TOK "); return(WRITEINT_TOK);}
+readint		{ column += 7; printf("READINT_TOK "); return(READINT_TOK);}
 
-{CHAR_CONST}	{ column += yyleng; return(CHAR_CONST_TOK);}
-{STR_CONST}		{ column += yyleng; return(STR_CONST_TOK);}
+{CHAR_CONST}	{ column += yyleng; printf("CHAR_CONST_TOK "); return(CHAR_CONST_TOK);}
+{STR_CONST}		{ column += yyleng; printf("STR_CONST_TOK "); return(STR_CONST_TOK);}
 {NUMBER}		{ 
 				intval = atoi(yytext);
 				if (intval > 65536){
@@ -65,6 +63,7 @@ readint		{ column += 7; return(READINT_TOK);}
 				}
 				else {
 					column += yyleng; 
+                    printf("NUMBER_TOK "); 
 					return(NUMBER_TOK);}
 				}
 
@@ -75,6 +74,7 @@ readint		{ column += 7; return(READINT_TOK);}
 				}
 				else {
 				 	column += yyleng; 
+                    printf("ID_TOK "); 
 					return(ID_TOK);}
 				}
 {NUMBER}{ID}	{
@@ -82,33 +82,35 @@ readint		{ column += 7; return(READINT_TOK);}
 				yyterminate();
 				}
 
-"=="	{ column += 2; return(SAME);}
-"!="	{ column += 2; return(DIFFERENT);}
+"=="	{ column += 2; printf("SAME "); return(SAME);}
+"!="	{ column += 2; printf("DIFFERENT "); return(DIFFERENT);}
 
-"&&"	{ column += 2; return(AND);}
-"||"	{ column += 2; return(OR);}
+"&&"	{ column += 2; printf("AND "); return(AND);}
+"||"	{ column += 2; printf("OR "); return(OR);}
 
-"("		{ ++column; return(yytext[0]);}
-")"		{ ++column; return(yytext[0]);}
-","		{ ++column; return(yytext[0]);}
-"{"		{ ++column; return(yytext[0]);}
-"}"		{ ++column; return(yytext[0]);}
-"["		{ ++column; return(yytext[0]);}
-"]"		{ ++column; return(yytext[0]);}
-";"		{ ++column; return(yytext[0]);}
+"("		{ ++column; printf("( "); return(yytext[0]);}
+")"		{ ++column; printf(") "); return(yytext[0]);}
+","		{ ++column; printf(", "); return(yytext[0]);}
+"{"		{ ++column; printf("{ "); return(yytext[0]);}
+"}"		{ ++column; printf("} "); return(yytext[0]);}
+"["		{ ++column; printf("[ "); return(yytext[0]);}
+"]"		{ ++column; printf("] "); return(yytext[0]);}
+";"		{ ++column; printf("; "); return(yytext[0]);}
 
-"="		{ ++column; return(ASIGN);}
-"%"		{ ++column; return(MODULO);}
-"+"		{ ++column; return(SUM);}
-"-"		{ ++column; return(MINUS);}
-"*"		{ ++column; return(STAR);}
-"/"		{ ++column; return(DIVIDE);}
-"!"		{ ++column; return(NOT);}
+"="		{ ++column; printf("= "); return(ASIGN);}
+"%"		{ ++column; printf("MODULO "); return(MODULO);}
+"+"		{ ++column; printf("+ "); return(PLUS);}
+"-"		{ ++column; printf("- "); return(MINUS);}
+"*"		{ ++column; printf("* "); return(STAR);}
+"/"		{ ++column; printf("/ "); return(DIVIDE);}
+"!"		{ ++column; printf("! "); return(NOT);}
 
-"<"			{ ++column; return(LESS_THAN);}
-"<="		{ column += 2; return(LESS_THAN_EQUAL);}
-">="		{ column += 2; return(GREATER_THAN_EQUAL);}
-">"			{ ++column; return(GREATER_THAN);}	
+"<"			{ ++column; printf("< "); return(LESS_THAN);}
+"<="		{ column += 2; printf("<= ");  return(LESS_THAN_EQUAL);}
+">="		{ column += 2; printf(">= "); return(GREATER_THAN_EQUAL);}
+">"			{ ++column; printf("> "); return(GREATER_THAN);}	
+
+<<EOF>>		{ printf("\n"); yyterminate();}
 
 .			{
 			  printf("\n ERR_LEXICAL(%s) \nline:%d col:%d \n",yytext, line, column);
@@ -116,3 +118,7 @@ readint		{ column += 7; return(READINT_TOK);}
 			}
 
 %%
+
+int yywrap(void){
+		return 1;
+}
