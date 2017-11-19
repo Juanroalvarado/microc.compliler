@@ -47,6 +47,7 @@ break	{ column += 5; printf("BREAK_TOK "); return(BREAK_TOK);}
 puts	{ column += 4; printf("PUTS_TOK "); return(PUTS_TOK);}
 int		{ column += 3; printf("INT_TOK "); return(INT_TOK);}
 char	{ column += 4; printf("CHAR_TOK "); return(CHAR_TOK);}
+main	{ column += 5; printf("MAIN_TOK "); return(MAIN_TOK);}
 
 continue	{ column += 8; printf("CONTINUE_TOK "); return(CONTINUE_TOK);}
 

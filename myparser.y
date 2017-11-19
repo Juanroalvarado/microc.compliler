@@ -3,12 +3,13 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+union YYSTYPE;
 int yylex();
 void yyerror(const char *);
 
 %}
 
-
+%token MAIN_TOK
 
 %token IF_TOK 
 %token ELSE_TOK 
@@ -61,9 +62,20 @@ void yyerror(const char *);
 
 %expect 1
 
-%start micro_c_program	
+%start main_prog	
 
 %%
+
+main_prog	:
+					type_specifier
+					MAIN_TOK
+					'('
+					param_decl_list
+					')'
+					compound_stmt
+					elements_rep
+					;
+
 
 micro_c_program	:
 					type_specifier
@@ -72,18 +84,47 @@ micro_c_program	:
 					param_decl_list
 					')'
 					compound_stmt
+					
 					;
+					
+program_call :
+					type_specifier
+					ID_TOK 
+					'('
+					param_decl_list
+					')'
+					';'
+					
+					;
+		
+
+
+
+elements_rep :
+				elements_rep
+				elements
+				|
+				
+elements	: 
+				micro_c_program |
+				program_call 
+				;
+							
 
 type_specifier :
 					INT_TOK 
 					|CHAR_TOK
 					;
 
-param_decl_list : parameter_decl parameter_decl_rep |;
+param_decl_list : 
+			parameter_decl 
+			parameter_decl_rep 
+			|
+		;
 
 parameter_decl_rep :
-			','
 			parameter_decl_rep
+			','
 			parameter_decl
 			| 
 		;
@@ -100,23 +141,15 @@ compound_stmt :
 		;
 
 compound_stmt_opt : 
-			var_decl_rep 
+			 stmt_rep
+			;	
+			
+stmt_rep: 
 			stmt_rep
+			stmt
+			|
 			;
-
-var_decl_rep :
-			var_decl_rep
-			var_decl 
-			| 
-		;
-	
-stmt_rep :	
-			stmt_rep
-			stmt 
-			| 
-		;	
-
-
+			
 var_decl :
 			type_specifier 	
 			var_decl_list
@@ -151,6 +184,7 @@ opt_expr :
 
 
 stmt : 
+	var_decl |
 	compound_stmt |
 	cond_stmt |
 	while_stmt |
@@ -177,6 +211,7 @@ cond_stmt:
 
 
 opt_else:
+
 		ELSE_TOK
 		stmt
 		|
@@ -210,6 +245,7 @@ conjunction:
 ;
 
 comparison:
+
 	relation
 	| relation SAME relation
 	| relation DIFFERENT relation
@@ -233,15 +269,15 @@ op_list:
 ;
 
 sum:
-	sum '+' term
-	| sum '-' term
+	sum PLUS term
+	| sum MINUS term
 	| term
 ;
 
 term: 
 
-	term '*' factor
-	| term '/' factor
+	term STAR factor
+	| term DIVIDE factor
 	| term MODULO factor
 	| factor
 
@@ -258,6 +294,7 @@ primary:
 
 	NUMBER_TOK 
 	| CHAR_CONST_TOK
+	| STR_CONST_TOK
 	| ID_TOK
 	| READINT_TOK '(' ')' ';'
 	| '(' expr ')'	
