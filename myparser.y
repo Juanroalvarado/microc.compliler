@@ -10,12 +10,12 @@ void yyerror(const char *);
 %}
 
 %token MAIN_TOK
+%token VOID_TOK
 
 %token IF_TOK 
 %token ELSE_TOK 
 %token WHILE_TOK 
 %token RETURN_TOK 
-%token VOID_TOK 
 %token BREAK_TOK 
 %token PUTS_TOK 
 
@@ -62,9 +62,10 @@ void yyerror(const char *);
 
 %expect 1
 
-%start main_prog	
+%start elements_rep	
 
 %%
+
 
 main_prog	:
 					type_specifier
@@ -73,7 +74,6 @@ main_prog	:
 					param_decl_list
 					')'
 					compound_stmt
-					elements_rep
 					;
 
 
@@ -84,7 +84,6 @@ micro_c_program	:
 					param_decl_list
 					')'
 					compound_stmt
-					
 					;
 					
 program_call :
@@ -94,7 +93,6 @@ program_call :
 					param_decl_list
 					')'
 					';'
-					
 					;
 		
 
@@ -107,7 +105,9 @@ elements_rep :
 				
 elements	: 
 				micro_c_program |
-				program_call 
+				program_call |
+				main_prog |
+				var_decl
 				;
 							
 
@@ -193,7 +193,8 @@ stmt :
 	RETURN_TOK expr ';' |
 	READINT_TOK '(' ID_TOK ')' ';' |
 	WRITEINT_TOK '(' expr ')' ';' |
-	PUTS_TOK '(' expr ')' ';'
+	PUTS_TOK '(' expr ')' ';' |
+	program_call
 	;	
 
 while_stmt:
