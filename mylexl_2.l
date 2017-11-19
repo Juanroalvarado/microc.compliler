@@ -11,7 +11,7 @@ int intval;
 LETTER 	[a-zA-Z_]
 DIGIT	[0-9]
 CHAR_CONST	'[\x20-\xFF]'
-STR_CONST	\"([ -[][\]-~](\\[\\\"n]))\"
+STR_CONST	\".*[^\\\n"]\"
 
 ID		{LETTER}({LETTER}|{DIGIT})*
 HEXA	0[xX][0-9a-fA-F]{1,4}

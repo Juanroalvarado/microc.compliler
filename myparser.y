@@ -309,14 +309,24 @@ var_decl_array:
 	ID_TOK 
 	'[' NUMBER_TOK ']' 
 	dimension_rep
-	';'
-	| ID_TOK
+	|
+	ID_TOK 
+	'[' ']' 
+	dimension_rep
+	|
+	ID_TOK
 	'[' NUMBER_TOK ']' 
 	dimension_rep
 	ASIGN
 	'{' NUMBER_TOK  num_rep '}'
 	keys_rep
-	';'
+	|
+	ID_TOK
+	'[' ']' 
+	dimension_rep
+	ASIGN
+	'{' NUMBER_TOK  num_rep '}'
+	keys_rep
 ;
 
 
