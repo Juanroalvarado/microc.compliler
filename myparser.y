@@ -96,12 +96,11 @@ program_call :
 					;
 		
 
-
-
 elements_rep :
 				elements_rep
 				elements
 				|
+			;
 				
 elements	: 
 				micro_c_program |
@@ -109,7 +108,8 @@ elements	:
 				main_prog |
 				var_decl
 				;
-							
+				
+					
 
 type_specifier :
 					INT_TOK 
@@ -131,7 +131,13 @@ parameter_decl_rep :
 
 parameter_decl :
 			type_specifier 
+			ID_TOK |
+			type_specifier
 			ID_TOK
+			'[' ']' |
+			type_specifier
+			ID_TOK
+			'[' NUMBER_TOK ']'
 		;
 
 compound_stmt : 
@@ -301,7 +307,6 @@ primary:
 	| '(' expr ')'	
 
 ;
-
 
 
 var_decl_array: 
