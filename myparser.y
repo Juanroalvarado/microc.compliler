@@ -300,6 +300,7 @@ factor:
 primary: 
 
 	NUMBER_TOK 
+	| ID_TOK '[' NUMBER_TOK ']'
 	| CHAR_CONST_TOK
 	| STR_CONST_TOK
 	| ID_TOK
