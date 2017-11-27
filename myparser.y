@@ -2,12 +2,18 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include "linked-list.h" 
 
-union YYSTYPE;
 int yylex();
 void yyerror(const char *);
 
 %}
+
+%union{
+	int intval;
+	unsigned char charval;
+	node *tok;
+}
 
 %token MAIN_TOK
 %token VOID_TOK
@@ -29,7 +35,8 @@ void yyerror(const char *);
 %token CHAR_CONST_TOK 
 %token STR_CONST_TOK 
 %token NUMBER_TOK
-%token ID_TOK 
+%token <tok> ID_TOK 
+%token <tok> FUNC_ID
 
 %token SAME
 %token DIFFERENT
@@ -79,7 +86,7 @@ main_prog	:
 
 micro_c_program	:
 					type_specifier
-					ID_TOK 
+					FUNC_ID 
 					'('
 					param_decl_list
 					')'

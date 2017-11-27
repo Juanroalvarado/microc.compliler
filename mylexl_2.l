@@ -1,9 +1,21 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+
+#include "linked-list.h"
 #include "myparser.tab.h"
+
+extern node *CurrentSymbol;
+node *head = NULL;
 
 int column, line = 1;
 int intval;
+int canInsert = 1;
+
+
+
 %}
 
 %x comment
@@ -69,15 +81,61 @@ readint		{ column += 7; printf("READINT_TOK "); return(READINT_TOK);}
 				}
 
 {ID}			{
+				char idbuffer[13];
+				int retval, i;
+				
+				
 				if (yyleng > 12){
 					printf("\nIDLEN_ERROR \nline:%d col:%d \n", line, column);
 					yyterminate();
 				}
-				else {
-				 	column += yyleng; 
-                    printf("ID_TOK "); 
-					return(ID_TOK);}
+					strcpy(idbuffer,yytext);
+					for (i = 0; i < yyleng ; i++)
+						idbuffer[i] = toupper(idbuffer[i]);
+					if (canInsert){
+						yylval.tok = search(head,idbuffer);
+						
+						if(yylval.tok == NULL){
+							if(head == NULL){
+								if (FUNC_ID == 1){
+									yylval.tok = prepend(head,idbuffer,FUNC_ID);
+									head = yylval.tok;
+									retval = FUNC_ID;
+								}
+								else {
+									yylval.tok = prepend(head, idbuffer,ID_TOK);
+									head = yylval.tok;
+									retval = ID_TOK;
+								}
+								
+							}
+							else{
+								yylval.tok = append(head, idbuffer,ID_TOK);
+								head = yylval.tok;
+                        		retval = ID_TOK;
+							}
+						} // yylval.tok == NULL
+						else{
+							printf("\nError duplicado \nline:%d col:%d \n", line, column);	
+						}
+					}
+					else {
+						yylval.tok = search(head, idbuffer);
+						if (yylval.tok == NULL) {
+							printf("\nError semantico no declarado\n");
+						}
+						else {
+							retval = yylval.tok->varType;
+							printf("Returned token %d",retval);
+						}
+					}
+					
+				column += yyleng; 
+				printf("ID_TOK "); 
+				return(retval);
 				}
+			
+				
 {NUMBER}{ID}	{
 				printf("\nERR_LEXICAL \nline:%d col:%d \n", line, column);
 				yyterminate();

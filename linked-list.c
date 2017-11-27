@@ -2,9 +2,12 @@
 #include <stdlib.h>
 #include <stdarg.h> 
 
+#include "linked-list.h"
+#include "myparser.tab.h"
+
 /* Insertar por nodo key~nombre de variable, tipo,  token, numero de parametros, tipo de return  */
 
-node* create(char varName, int varType, node* next)
+node *create(char *varName, int varType, node *next)
 {
     node* new_node = (node*)malloc(sizeof(node));
     if(new_node == NULL)
@@ -20,14 +23,14 @@ node* create(char varName, int varType, node* next)
 }
 
 
-node* prepend(node* head, char varName, int varType)
+node *prepend(node *head, char *varName, int varType)
 {
     node* new_node = create(varName,varType,head);
     head = new_node;
     return head;
 }
 
-node* append(node* head, char varName, int varType)
+node *append(node *head, char *varName, int varType)
 {
     if(head == NULL)
 		return NULL;
@@ -43,23 +46,8 @@ node* append(node* head, char varName, int varType)
     return head;
 }
 
-void traverse(node* head,callback f)
-{
-    node* cursor = head;
-    while(cursor != NULL)
-    {
-        f(cursor);
-        cursor = cursor->next;
-    }
-}
 
-void display(node* n)
-{
-    if(n != NULL)
-        printf("%d ", n->varName);
-}
-
-node* search(node* head, char varName)
+node *search(node *head, char *varName)
 {
  
     node *cursor = head;
@@ -88,3 +76,5 @@ void dispose(node *head)
         }
     }
 }
+
+
