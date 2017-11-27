@@ -86,7 +86,7 @@ main_prog	:
 
 micro_c_program	:
 					type_specifier
-					FUNC_ID 
+					ID_TOK 
 					'('
 					param_decl_list
 					')'
