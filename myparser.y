@@ -4,8 +4,13 @@
 #include <stdlib.h>
 #include "linked-list.h" 
 
+
+extern node *GlobalSymbol, *CurrentSymbo;
+node *LocalSymbol;
+int func_id;
 int yylex();
 void yyerror(const char *);
+extern int line,column;
 
 %}
 
@@ -13,6 +18,7 @@ void yyerror(const char *);
 	int intval;
 	unsigned char charval;
 	node *tok;
+	node *tmp;
 }
 
 %token MAIN_TOK
@@ -35,8 +41,8 @@ void yyerror(const char *);
 %token CHAR_CONST_TOK 
 %token STR_CONST_TOK 
 %token NUMBER_TOK
-%token <tok> ID_TOK 
-%token <tok> FUNC_ID
+%token ID_TOK 
+%token FUNC_ID
 
 %token SAME
 %token DIFFERENT
@@ -74,6 +80,7 @@ void yyerror(const char *);
 %%
 
 
+
 main_prog	:
 					type_specifier
 					MAIN_TOK
@@ -86,20 +93,13 @@ main_prog	:
 
 micro_c_program	:
 					type_specifier
-					ID_TOK 
+					{func_id = 1;}
+					FUNC_ID 
+					{func_id = 0;}
 					'('
 					param_decl_list
 					')'
 					compound_stmt
-					;
-					
-program_call :
-					type_specifier
-					ID_TOK 
-					'('
-					param_decl_list
-					')'
-					';'
 					;
 		
 
@@ -111,9 +111,7 @@ elements_rep :
 				
 elements	: 
 				micro_c_program |
-				program_call |
-				main_prog |
-				var_decl
+				main_prog 
 				;
 				
 					
@@ -206,8 +204,7 @@ stmt :
 	RETURN_TOK expr ';' |
 	READINT_TOK '(' ID_TOK ')' ';' |
 	WRITEINT_TOK '(' expr ')' ';' |
-	PUTS_TOK '(' expr ')' ';' |
-	program_call
+	PUTS_TOK '(' expr ')' ';' 
 	;	
 
 while_stmt:
@@ -313,9 +310,12 @@ primary:
 	| ID_TOK
 	| READINT_TOK '(' ')' ';'
 	| '(' expr ')'	
+	| type_specifier FUNC_ID '(' param_decl_list ')' ';'
 
 ;
 
+
+					
 
 var_decl_array: 
  
@@ -356,7 +356,6 @@ num_rep: num_rep ',' NUMBER_TOK | ;
 
 %% 
 
-extern int line,column;
 
 int main(int argc, char **argv)
 {

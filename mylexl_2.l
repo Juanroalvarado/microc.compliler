@@ -9,12 +9,12 @@
 
 extern node *CurrentSymbol;
 node *head = NULL;
+node *tmp = NULL;
 
 int column, line = 1;
 int intval;
 int canInsert = 1;
-
-
+extern int func_id;
 
 %}
 
@@ -69,7 +69,7 @@ readint		{ column += 7; printf("READINT_TOK "); return(READINT_TOK);}
 {CHAR_CONST}	{ column += yyleng; printf("CHAR_CONST_TOK "); return(CHAR_CONST_TOK);}
 {STR_CONST}		{ column += yyleng; printf("STR_CONST_TOK "); return(STR_CONST_TOK);}
 {NUMBER}		{ 
-				intval = atoi(yytext);
+				yylval.intval = atoi(yytext);
 				if (intval > 65536){
 					printf("\nNUMLEN_ERROR \nline:%d col:%d \n", line, column);
 					yyterminate();
@@ -81,57 +81,56 @@ readint		{ column += 7; printf("READINT_TOK "); return(READINT_TOK);}
 				}
 
 {ID}			{
-				char idbuffer[13];
+				
 				int retval, i;
+				
+				/*printf("func id: %d\n",func_id);*/
 				
 				
 				if (yyleng > 12){
 					printf("\nIDLEN_ERROR \nline:%d col:%d \n", line, column);
 					yyterminate();
 				}
-					strcpy(idbuffer,yytext);
-					for (i = 0; i < yyleng ; i++)
-						idbuffer[i] = toupper(idbuffer[i]);
+					
+				
+						
 					if (canInsert){
-						yylval.tok = search(head,idbuffer);
+						
+						yylval.tok = search(head, yytext);
 						
 						if(yylval.tok == NULL){
+							
 							if(head == NULL){
-								if (FUNC_ID == 1){
-									yylval.tok = prepend(head,idbuffer,FUNC_ID);
-									head = yylval.tok;
+								if (func_id == 1){
+									
+									yylval.tok = prepend(head, yytext, FUNC_ID);
 									retval = FUNC_ID;
+									printf("FUNC_ID "); 
+									
 								}
 								else {
-									yylval.tok = prepend(head, idbuffer,ID_TOK);
+									yylval.tok = prepend(head, yytext, ID_TOK);
+									printf("The yytext: %s", yytext);
 									head = yylval.tok;
 									retval = ID_TOK;
+									printf("ID_TOK "); 
 								}
 								
 							}
 							else{
-								yylval.tok = append(head, idbuffer,ID_TOK);
+								yylval.tok = append(head, yytext, ID_TOK);
+								printf("The yytext: %s", yytext);
 								head = yylval.tok;
                         		retval = ID_TOK;
+								printf("ID_TOK "); 
 							}
 						} // yylval.tok == NULL
 						else{
 							printf("\nError duplicado \nline:%d col:%d \n", line, column);	
 						}
 					}
-					else {
-						yylval.tok = search(head, idbuffer);
-						if (yylval.tok == NULL) {
-							printf("\nError semantico no declarado\n");
-						}
-						else {
-							retval = yylval.tok->varType;
-							printf("Returned token %d",retval);
-						}
-					}
 					
 				column += yyleng; 
-				printf("ID_TOK "); 
 				return(retval);
 				}
 			

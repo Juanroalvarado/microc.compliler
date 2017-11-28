@@ -9,6 +9,7 @@
 
 node *create(char *varName, int varType, node *next)
 {
+	printf("created\n");
     node* new_node = (node*)malloc(sizeof(node));
     if(new_node == NULL)
     {
@@ -18,30 +19,34 @@ node *create(char *varName, int varType, node *next)
     new_node->varName = varName;
 	new_node->varType = varType;
     new_node->next = next;
- 
     return new_node;
 }
 
 
 node *prepend(node *head, char *varName, int varType)
 {
-    node* new_node = create(varName,varType,head);
+	printf("prepended\n");
+    node *new_node = create(varName,varType,head);
     head = new_node;
     return head;
 }
 
 node *append(node *head, char *varName, int varType)
 {
+	printf("appended\n");
     if(head == NULL)
 		return NULL;
     /* go to the last node */
     node *cursor = head;
-    while(cursor->next != NULL)
-        cursor = cursor->next;
- 
+    while(cursor->next != NULL){
+		cursor = cursor->next;
+		printf("Siguiente: \n");
+	}
     /* create a new node */
-    node* new_node = create(varName,varType,NULL);
+    node *new_node = create(varName,varType,NULL);
     cursor->next = new_node;
+	
+	printf("head is: %s",head->varName);
  
     return head;
 }
@@ -49,7 +54,7 @@ node *append(node *head, char *varName, int varType)
 
 node *search(node *head, char *varName)
 {
- 
+ 	
     node *cursor = head;
     while(cursor!=NULL)
     {
@@ -57,6 +62,8 @@ node *search(node *head, char *varName)
             return cursor;
         cursor = cursor->next;
     }
+	printf("Returning NULL\n");
+
     return NULL;
 }
 
